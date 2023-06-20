@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Online Assessment</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+        button[type="submit"] {
+            display: block;
+            margin: 10px auto;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #5407fa;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        
+        textarea {
+            display: block;
+            margin: 0 auto;
+            width: 80%;
+            height: 200px;
+            border: 2px solid #000;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #F5EBEB;
+        }
+        
+        form {
+            margin: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-image:url('https://img.freepik.com/free-vector/paper-style-white-monochrome-background_52683-66443.jpg?size=626&ext=jpg');
+            background-color: #d3b4b4;
+            padding: 20px;
+        }
+        
+        #next-btn {
+            background-color: #047af8;
+            /* Set the desired background color */
+            color: #fff;
+            /* Set the desired text color */
+            float:right;
+            padding: 10px 25px;
+        }
+	</style>
+</head>
+<body>
+	<h1>Online Assessment</h1>
+	<form id="question-form">
+		<label for="question"><h3>Answer the following Question in less than 50 words</h3></label>
+        <p>Question 1 : Write a brief introduction about yourself.</p>
+		<textarea id="question" placeholder="Write your answer here"></textarea>
+        <input type="text" name="userId" id="userId" placeholder="User ID">
+
+		<input type="submit" id="next-btn" value="Next">
+	</form>
+	
+    <script>
+        const questionForm = document.getElementById("question-form");
+        const userIdInput = document.getElementById("userId");
+    
+        // Retrieve the user ID from the server-side when the page loads
+        fetch("/users")
+
+        .then((response) => {
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch user data');
+
+            }
+            return response.json();
+        })
+        .then((data) => 
+        {
+
+            const userId = data[data.length - 1].userId;
+            userIdInput.value = userId;
+            console.log('User ID:', userId); 
+        })
+    .catch((error) => {
+
+        console.error('Error fetching user data:', error);
+    });
+
+    
+            questionForm.addEventListener('submit', event => {
+
+                event.preventDefault(); // prevent form from submitting
+                const formData = new FormData(event.target); // get form data
+                console.log('Form Data:', formData);
+                const answer = formData.get('question'); // get the answer
+                const userId = formData.get('userId'); // get the user ID
+                console.log('User ID of form:', userId);
+
+  // Create an object with the user ID and answer
+                const userData = { userId, answer };
+
+  // Store the user data in local storage
+                localStorage.setItem("userData", JSON.stringify(userData));
+                console.log('User Data is:', userData); 
+
+                window.location.href = "/question2"; // redirect to the next question
+            });
+    </script>
+    
+    <script>
+        let textBox = document.getElementById('question');
+        const btn = document.getElementById('next-btn');
+        const data = [];
+    
+        const Key = [];
+        const downTime = [];
+        const upTime = [];
+        let keyCount = 0; // variable to count number of keys pressed
+        let wordCount = 0; // variable to count number of words pressed
+        let backspaceCount = 0; // variable to count number of times backspace is pressed
+    
+        // const start = new Date().getTime();
+    
+        textBox.addEventListener('keydown', (event) => {
+            // const downtime = new Date().getTime() - start;
+            const downtime = Date.now();
+            downTime.push(downtime);
+        });
+    
+        textBox.addEventListener('keyup', (event) => {
+            // const uptime = new Date().getTime() - start;
+            const uptime = Date.now();
+            const key = event.key;
+            upTime.push(uptime);
+            Key.push(key);
+    
+            // count number of keys pressed
+            keyCount++;
+    
+            // count number of words pressed
+            if (event.key === ' ' && textBox.value.trim() !== '') {
+                wordCount++;
+            }
+    
+            // count number of times backspace is pressed
+            if (event.key === 'Backspace') {
+                backspaceCount++;
+            }
+        });
+        wordCount++;
+    
+        // const user_id = "{{ request.user.id }}";
+    
+        btn.addEventListener('click', (e) => {
+
+            const userData = JSON.parse(localStorage.getItem("userData"));
+            const userId = userData.userId; 
+
+            console.log("User isss:", userId); // Retrieve the user ID from local storage
+
+            for (let i = 0; i < Key.length; i++) {
+
+                const asciiValue = Key[i].charCodeAt(0);
+                data.push({
+
+                    key: asciiValue,
+                    downtime: downTime[i],
+                    uptime: upTime[i],
+                    dwellTime: upTime[i] - downTime[i],
+                    flightTime: Math.abs(downTime[i + 1] - upTime[i]),
+                    inter_key_latency: Math.abs(downTime[i + 1] - downTime[i]),
+                    userId: userId // Assign the user ID to each data entry
+    });
+  }
+
+  let csv = 'key,dwell_time,flight_time,inter_key_latency,user_id\n';
+  for (let i = 0; i < data.length; i++) {
+    csv += `${data[i].key},${data[i].dwellTime},${data[i].flightTime},${data[i].inter_key_latency},${data[i].userId}\n`;
+  }
+
+  // Create a Blob object from the CSV string
+  const blob = new Blob([csv], { type: 'text/csv' });
+
+  // Create a download link and trigger the download
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'data_training.csv';
+  link.click();
+
+  console.log('Number of keys pressed:', keyCount);
+  console.log('Number of words pressed:', wordCount);
+  console.log('Number of times backspace is pressed:', backspaceCount);
+  localStorage.setItem("keyCount", keyCount);
+  localStorage.setItem("wordCount", wordCount);
+  localStorage.setItem("backspaceCount", backspaceCount);
+  localStorage.setItem("data", JSON.stringify(data));
+});
+
+
+            
+    
+    </script>
+</body>
+</html>

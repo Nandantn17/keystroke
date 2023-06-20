@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication</title>
+    <style>
+        /* styles.css */
+
+        body {
+          font-family: Arial, sans-serif;
+          background-image: url('https://img.freepik.com/premium-photo/retro-style-background_522560-5795.jpg?size=626&ext=jpg');
+          background-repeat: no-repeat;
+          background-size: cover; /* Adjust the background-size property */
+          background-position: center;
+          padding: 10%; /* Adjust the padding value */
+          background-color: rgba(211, 180, 180, 0.0); /* Adjust the background color's opacity */
+        }
+        
+        /* Media query for smaller devices */
+        @media (max-width: 768px) {
+          body {
+            padding: 20px; /* Adjust the padding value for smaller devices */
+          }
+        }
+        
+
+.alert {
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.alert-success {
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+}
+
+.alert-danger {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}
+
+.alert-dismissible {
+  padding-right: 40px;
+}
+
+.alert-dismissible .close {
+  position: relative;
+  top: -2px;
+  right: -21px;
+  color: inherit;
+}
+
+h3 {
+  color: #333;
+  text-align: center;
+  margin-top: 30px;
+}
+
+h1 , h4{
+  color: #000000;
+  text-align:center;
+  margin-top: 10px;
+}
+#message-container {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+button[type="submit"] {
+  display: block;
+  margin: 10px auto;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+}
+
+button[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+a {
+  color: #0808f4;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.login-message {
+		  text-align: center;
+		  color: rgb(245, 0, 0);
+		  margin-top: 10px;
+		}
+
+</style>
+</head>
+<body>
+
+    <div id="message-container"></div>
+
+    <script>
+
+    // Get the URL search parameters
+        const urlParams = new URLSearchParams(window.location.search);
+
+    // Check if the signup success message exists in the URL
+        if (urlParams.has('message') && urlParams.get('message') === 'signup-success') {
+            const messageContainer = document.getElementById('message-container');
+            messageContainer.textContent = 'Signup successful! You can now sign in.';
+
+        }
+    </script>
+
+    
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+      
+        <button type="button" class="close" data-dismiss="alert" aria-label="close">
+        <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    
+
+    <h1> Welcome to Online Examination system </h1>
+
+    <h4> Dear user, this is the research work conducting in SIT under the proctorship of Dr.Jagadamba G, Please complete the test in a go. </h2>
+    
+    
+    <!-- <button type="submit"><a href="/signout">Signout</a></button> -->
+   
+    <!-- <button type="submit"> <a href="/signup">Signup</a></button> -->
+    <p class="login-message">New User? <a href="signup">Sign Up</a></p>
+    <p class="login-message">Already Registered ?<a href="/signin">Sign In</a></p>
+    <!-- <button type="submit"><a href="/signin">Signin</a></button> -->
+    
+</body>
+</html>
